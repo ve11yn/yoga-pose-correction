@@ -1,11 +1,3 @@
-"""
-Real-Time Yoga Pose Correction System
-
-This module provides real-time pose correction from webcam feed.
-Imports feature extraction from yoga_pose_classifier.py
-Imports correction rules from pose_rules.py
-"""
-
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -14,7 +6,6 @@ from collections import deque, Counter
 from typing import List, Tuple, Dict, Optional
 import time
 
-# Import from your existing modules
 from yoga_pose_classifier import (
     calculate_angle,
     calculate_distance, 
@@ -23,22 +14,11 @@ from yoga_pose_classifier import (
 )
 from pose_rules import POSE_CORRECTION_RULES
 
-# Initialize MediaPipe
 mp_pose = mp.solutions.pose
 mp_drawing = mp.solutions.drawing_utils
 
 
 class RealtimePoseCorrector:
-    """
-    Real-time pose correction system for video input.
-    
-    Features:
-    - Temporal smoothing (reduces jitter)
-    - Confidence filtering
-    - Pose stability checking
-    - Rule-based corrections
-    """
-    
     def __init__(self, 
                  model_path='svm_classifier.pkl',
                  smoothing_window=7,
@@ -46,14 +26,12 @@ class RealtimePoseCorrector:
                  min_hold_frames=10):
         """
         Initialize the corrector.
-        
         Args:
             model_path: Path to trained SVM model pickle file
             smoothing_window: Number of frames to average predictions (default: 7)
             min_confidence: Minimum confidence to accept prediction (default: 0.70)
             min_hold_frames: Frames needed before showing corrections (default: 10)
         """
-        # Load trained model
         print("Loading model...")
         with open(model_path, 'rb') as f:
             data = pickle.load(f)
@@ -150,7 +128,7 @@ class RealtimePoseCorrector:
         
         # Check if we have rules for this pose
         if pose_name not in POSE_CORRECTION_RULES:
-            return ["✅ Great form!"]
+            return ["Great form!"]
         
         rules = POSE_CORRECTION_RULES[pose_name]
         lm = landmarks.landmark
@@ -416,7 +394,7 @@ def main():
     try:
         corrector = RealtimePoseCorrector('svm_classifier.pkl')
     except FileNotFoundError:
-        print("❌ Error: svm_classifier.pkl not found!")
+        print("Error: svm_classifier.pkl not found!")
         print("   Make sure the model file is in the same directory.")
         return
     
@@ -425,7 +403,7 @@ def main():
     cap = cv2.VideoCapture(0)
     
     if not cap.isOpened():
-        print("❌ Error: Could not open webcam")
+        print("Error: Could not open webcam")
         return
     
     print("✓ Webcam opened")
