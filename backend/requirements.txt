@@ -5,4 +5,4 @@ mediapipe
 scikit-learn
 opencv-python
 pydantic
-protobuf==3.20.*
+protobuf
