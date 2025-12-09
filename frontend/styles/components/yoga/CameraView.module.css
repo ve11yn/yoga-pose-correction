@@ -150,6 +150,81 @@
     transform: scale(0.95);
 }
 
+.recordBtn {
+    background-color: rgba(62, 94, 107, 0.4);
+    border: 1px solid rgba(148, 183, 209, 0.2);
+    border-radius: 9999px;
+    padding-left: 1rem;
+    padding-right: 1.25rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #FAF3EF;
+    box-shadow: none !important;
+    backdrop-filter: blur(16px);
+    transition: all 150ms;
+}
+
+.recordBtn:hover {
+    background-color: rgba(62, 94, 107, 0.6);
+    transform: scale(1.05);
+}
+
+.recordBtn:active {
+    transform: scale(0.95);
+}
+
+.recordIconWrapper {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 150ms;
+}
+
+.recordDot {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 9999px;
+    background-color: #FAF3EF;
+    transition: all 150ms;
+}
+
+.recordText {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    transition: all 150ms;
+}
+
+.recordBtnActive {
+    background-color: rgba(220, 38, 38, 0.5) !important;
+    border-color: rgba(220, 38, 38, 0.6) !important;
+    animation: recordPulse 2s ease-in-out infinite;
+}
+
+.recordBtnActive .recordIconWrapper {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.recordBtnActive .recordDot {
+    background-color: #ef4444;
+    animation: recordDotPulse 1.5s ease-in-out infinite;
+}
+
+.recordBtnActive .recordText {
+    color: #ef4444;
+}
+
+.recordBtnActive:hover {
+    background-color: rgba(220, 38, 38, 0.7) !important;
+}
+
 .endSessionBtn {
     display: flex;
     align-items: center;
@@ -376,5 +451,33 @@
     50% {
         opacity: .5;
         transform: scale(1.05);
+    }
+}
+
+@keyframes recordPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+    }
+
+    50% {
+        opacity: 0.9;
+        box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
+    }
+}
+
+@keyframes recordDotPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
     }
 }

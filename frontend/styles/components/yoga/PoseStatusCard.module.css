@@ -86,5 +86,6 @@
 }
 
 .matchDotBad {
-    background-color: #E2D7CF;
+    background-color: #FF6B6B;
+    box-shadow: 0 0 8px #FF6B6B;
 }

@@ -43,7 +43,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                     })
                 ) : (
                     <div className={styles.waitingMessage}>
-                        Listening to your body...
+                        Analyzing your pose...
                     </div>
                 )}
             </div>

@@ -114,7 +114,7 @@ async def classify_pose(data: PoseData):
         print(f"Pred: {pose_name} ({confidence:.2f})") # Debug log
         
         # 5. Check Corrections
-        corrections = check_corrections_logic(wrapped_landmarks, pose_name)
+        corrections = check_corrections_logic(wrapped_landmarks, pose_name, confidence)
         
         return PredictionResponse(
             pose_name=pose_name,
@@ -126,7 +126,7 @@ async def classify_pose(data: PoseData):
         print(f"Error processing pose: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-def check_corrections_logic(landmarks, pose_name: str) -> List[str]:
+def check_corrections_logic(landmarks, pose_name: str, confidence: float) -> List[str]:
     """
     Re-implementation of check_corrections from correction.py to start from wrapper.
     Ideally we should import this logic if it was a standalone function, 
@@ -231,8 +231,12 @@ def check_corrections_logic(landmarks, pose_name: str) -> List[str]:
             if val < min_dist:
                 corrections.append(message)
 
-    if not corrections:
+    # Only show "perfect" if no corrections AND confidence is high (>80%)
+    if not corrections and confidence > 0.8:
         corrections.append("✅ posture perfect!")
+    elif not corrections:
+        # No corrections but low confidence - encourage better positioning
+        corrections.append("Good form! Try to hold the pose more steadily.")
         
     return corrections
 

@@ -30,6 +30,13 @@ export function useYogaSession() {
     const lastSpokenTimeRef = useRef<number>(0);
     const lastSpokenMessageRef = useRef<string>("");
 
+    // Recording Refs
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const recordedChunksRef = useRef<Blob[]>([]);
+
+    // Recording State
+    const [isRecording, setIsRecording] = useState(false);
+
     // Timer Effect
     useEffect(() => {
         let interval: NodeJS.Timeout;
@@ -51,18 +58,38 @@ export function useYogaSession() {
         if (corrections.length === 0) return;
 
         const now = Date.now();
-        const activeCorrection = corrections.find(c => !c.includes("✅") && !c.includes("Excellent") && !c.includes("posture perfect"));
 
-        if (activeCorrection) {
-            if (activeCorrection !== lastSpokenMessageRef.current || (now - lastSpokenTimeRef.current > 5000)) {
-                const utterance = new SpeechSynthesisUtterance(activeCorrection);
-                utterance.rate = 1.1;
+        // Get the most recent correction (last one in array)
+        // This ensures we only speak what's currently most relevant
+        const latestCorrection = corrections[corrections.length - 1];
+
+        // Check if it's a positive message
+        const isPositive = latestCorrection.includes("✅") ||
+            latestCorrection.includes("Excellent") ||
+            latestCorrection.includes("posture perfect");
+
+        // Speak if:
+        // 1. It's a new message (different from last spoken)
+        // 2. OR enough time has passed (5s for corrections, 10s for positive feedback)
+        const timeSinceLastSpoken = now - lastSpokenTimeRef.current;
+        const cooldownTime = isPositive ? 10000 : 5000; // 10s for positive, 5s for corrections
+
+        const isNewMessage = latestCorrection !== lastSpokenMessageRef.current;
+        const isCooldownExpired = timeSinceLastSpoken > cooldownTime;
+
+        if (isNewMessage || isCooldownExpired) {
+            // If it's a NEW message, cancel ongoing speech immediately
+            // This ensures audio switches to new feedback right away
+            if (isNewMessage) {
                 window.speechSynthesis.cancel();
-                window.speechSynthesis.speak(utterance);
-
-                lastSpokenMessageRef.current = activeCorrection;
-                lastSpokenTimeRef.current = now;
             }
+
+            const utterance = new SpeechSynthesisUtterance(latestCorrection);
+            utterance.rate = 1.1;
+            window.speechSynthesis.speak(utterance);
+
+            lastSpokenMessageRef.current = latestCorrection;
+            lastSpokenTimeRef.current = now;
         }
     }, [corrections, isSoundEnabled]);
 
@@ -120,11 +147,57 @@ export function useYogaSession() {
                     } catch (err) {
                         console.error("API Error", err);
                     }
+                } else {
+                    // No pose detected - reset to default state
+                    setCurrentPose("Waiting...");
+                    setConfidence(0);
+                    setCorrections([]);
                 }
                 canvasCtx.restore();
             }
         }
-    }, []);
+    }, [isActive, isRecording]);
+
+    // Reset state when session stops
+    useEffect(() => {
+        if (!isActive) {
+            // Aggressively stop all audio - use multiple methods for reliability
+            // Method 1: Pause first
+            window.speechSynthesis.pause();
+
+            // Method 2: Cancel
+            window.speechSynthesis.cancel();
+
+            // Method 3: Resume then cancel again (clears queue in some browsers)
+            window.speechSynthesis.resume();
+            window.speechSynthesis.cancel();
+
+            // Method 4: Force with setTimeout
+            setTimeout(() => {
+                window.speechSynthesis.cancel();
+            }, 0);
+
+            setTimeout(() => {
+                window.speechSynthesis.cancel();
+            }, 100);
+
+            // Reset state
+            setCurrentPose("Waiting...");
+            setConfidence(0);
+            setCorrections([]);
+            setStats({ fps: 0, sessionTime: 0 });
+
+            // Reset TTS refs
+            lastSpokenTimeRef.current = 0;
+            lastSpokenMessageRef.current = "";
+
+            // Stop recording if active
+            if (isRecording && mediaRecorderRef.current) {
+                mediaRecorderRef.current.stop();
+                setIsRecording(false);
+            }
+        }
+    }, [isActive, isRecording]);
 
     // Initialize MediaPipe
     useEffect(() => {
@@ -190,6 +263,53 @@ export function useYogaSession() {
         };
     }, [isActive, onResults]);
 
+    // Recording Functions
+    const startRecording = useCallback(() => {
+        if (!webcamRef.current?.stream) {
+            console.error("No webcam stream available");
+            return;
+        }
+
+        try {
+            recordedChunksRef.current = [];
+            const stream = webcamRef.current.stream;
+
+            const options = { mimeType: 'video/webm;codecs=vp9' };
+            const mediaRecorder = new MediaRecorder(stream, options);
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    recordedChunksRef.current.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `yoga-session-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.webm`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            };
+
+            mediaRecorderRef.current = mediaRecorder;
+            mediaRecorder.start();
+            setIsRecording(true);
+        } catch (error) {
+            console.error("Error starting recording:", error);
+        }
+    }, []);
+
+    const stopRecording = useCallback(() => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+        }
+    }, [isRecording]);
+
     return {
         webcamRef,
         canvasRef,
@@ -200,6 +320,9 @@ export function useYogaSession() {
         corrections,
         stats,
         isSoundEnabled,
-        toggleSound: () => setIsSoundEnabled(prev => !prev)
+        toggleSound: () => setIsSoundEnabled(prev => !prev),
+        isRecording,
+        startRecording,
+        stopRecording
     };
 }

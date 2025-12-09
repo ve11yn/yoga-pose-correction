@@ -1,6 +1,6 @@
 import React, { RefObject } from "react";
 import Webcam from "react-webcam";
-import { Camera, Volume2, VolumeX, ArrowRight, Pause } from "lucide-react";
+import { Camera, Volume2, VolumeX, ArrowRight, Pause, Circle } from "lucide-react";
 import { formatTime, cn } from "./utils";
 import styles from "../../styles/components/yoga/CameraView.module.css";
 
@@ -14,6 +14,9 @@ interface CameraViewProps {
     onToggleSound: () => void;
     onStart: () => void;
     onStop: () => void;
+    isRecording: boolean;
+    onStartRecording: () => void;
+    onStopRecording: () => void;
 }
 
 export const CameraView: React.FC<CameraViewProps> = ({
@@ -25,7 +28,10 @@ export const CameraView: React.FC<CameraViewProps> = ({
     isSoundEnabled,
     onToggleSound,
     onStart,
-    onStop
+    onStop,
+    isRecording,
+    onStartRecording,
+    onStopRecording
 }) => {
     return (
         <div className={`${styles.cameraContainer} ${isActive ? styles.cameraContainerActive : styles.cameraContainerInactive}`}>
@@ -73,6 +79,18 @@ export const CameraView: React.FC<CameraViewProps> = ({
                             <div className={styles.fpsBadge}>
                                 {fps} FPS
                             </div>
+                            <button
+                                onClick={isRecording ? onStopRecording : onStartRecording}
+                                className={`${styles.recordBtn} ${isRecording ? styles.recordBtnActive : ''}`}
+                                title={isRecording ? "Stop Recording" : "Start Recording"}
+                            >
+                                <div className={styles.recordIconWrapper}>
+                                    <div className={styles.recordDot} />
+                                </div>
+                                <span className={styles.recordText}>
+                                    {isRecording ? 'REC' : 'REC'}
+                                </span>
+                            </button>
                             <button
                                 onClick={onToggleSound}
                                 className={styles.soundBtn}

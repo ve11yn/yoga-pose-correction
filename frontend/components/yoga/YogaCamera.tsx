@@ -18,7 +18,10 @@ export default function YogaCam() {
         corrections,
         stats,
         isSoundEnabled,
-        toggleSound
+        toggleSound,
+        isRecording,
+        startRecording,
+        stopRecording
     } = useYogaSession();
 
     return (
@@ -41,6 +44,9 @@ export default function YogaCam() {
                     onToggleSound={toggleSound}
                     onStart={() => setIsActive(true)}
                     onStop={() => setIsActive(false)}
+                    isRecording={isRecording}
+                    onStartRecording={startRecording}
+                    onStopRecording={stopRecording}
                 />
 
                 {/* Overlays Wrapper - Inside the relative container so they float ON component */}
