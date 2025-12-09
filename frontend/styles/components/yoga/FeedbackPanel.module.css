@@ -1,0 +1,153 @@
+/* FeedbackPanel Component Styles */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.feedbackList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    align-items: flex-start;
+}
+
+.stopButtonWrapper {
+    margin-top: 1rem;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.feedbackItem {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: slideUp 0.3s ease-out;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.feedbackItemGood {
+    color: #3E5E6B;
+    /* Deep Teal */
+    font-weight: 600;
+}
+
+.feedbackItemBad {
+    color: #FAF3EF;
+    /* Cream */
+    font-weight: 600;
+}
+
+.iconCircle {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.iconCircleGood {
+    background-color: #94B7D1;
+    color: #3E5E6B;
+}
+
+.iconCircleBad {
+    background-color: #E2D7CF;
+    color: #3E5E6B;
+}
+
+.messageText {
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.025em;
+}
+
+.waitingMessage {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-radius: 9999px;
+    backdrop-filter: blur(24px);
+    background-color: rgba(62, 94, 107, 0.2);
+    border: 1px solid rgba(148, 183, 209, 0.1);
+    color: #3E5E6B;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.stopButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-radius: 9999px;
+    background-color: rgba(62, 94, 107, 0.1);
+    border: 1px solid rgba(62, 94, 107, 0.2);
+    transition: all 150ms;
+    color: #3E5E6B;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+}
+
+.stopButton:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    /* Red-500 equivalent */
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.stopIconCircle {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 9999px;
+    background-color: rgba(62, 94, 107, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 150ms, color 150ms;
+}
+
+.stopButton:hover .stopIconCircle {
+    background-color: #ef4444;
+    color: white;
+}

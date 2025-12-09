@@ -1,0 +1,131 @@
+/* Features Component Styles */
+.section {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+    position: relative;
+    background: linear-gradient(to bottom, transparent, rgba(250, 243, 239, 0.3));
+    /* Cream fade */
+}
+
+.container {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+@media (min-width: 768px) {
+    .container {
+        padding-left: 6rem;
+        padding-right: 6rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .container {
+        padding-left: 8rem;
+        padding-right: 8rem;
+    }
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.subtitle {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #E2D7CF;
+    /* Beige */
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.title {
+    font-size: 2.25rem;
+    font-weight: 900;
+    color: #3E5E6B;
+    /* Deep Teal */
+}
+
+@media (min-width: 768px) {
+    .title {
+        font-size: 3rem;
+    }
+}
+
+.grid {
+    display: grid;
+    gap: 2rem;
+}
+
+@media (min-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.card {
+    padding: 2rem;
+    border-radius: 2rem;
+    background-color: white;
+    border: 1px solid #94B7D1;
+    /* Sky Blue */
+    box-shadow: 0 10px 15px -3px rgba(62, 94, 107, 0.05), 0 4px 6px -2px rgba(62, 94, 107, 0.025);
+    transition: all 300ms;
+    cursor: pointer;
+}
+
+.card:hover {
+    box-shadow: 0 20px 25px -5px rgba(62, 94, 107, 0.1), 0 10px 10px -5px rgba(62, 94, 107, 0.04);
+    border-color: #E2D7CF;
+    /* Beige */
+    transform: translateY(-0.25rem);
+}
+
+.iconBox {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    transition: transform 300ms;
+}
+
+.card:hover .iconBox {
+    transform: scale(1.1);
+}
+
+/* Specific icon box colors */
+.iconBox1 {
+    background-color: rgba(62, 94, 107, 0.1);
+    color: #3E5E6B;
+}
+
+.iconBox2 {
+    background-color: rgba(148, 183, 209, 0.3);
+    color: #3E5E6B;
+}
+
+.iconBox3 {
+    background-color: rgba(226, 215, 207, 0.2);
+    color: #3E5E6B;
+}
+
+.cardTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #3E5E6B;
+    margin-bottom: 0.75rem;
+}
+
+.cardDesc {
+    color: rgba(62, 94, 107, 0.7);
+    line-height: 1.625;
+    font-size: 0.875rem;
+}

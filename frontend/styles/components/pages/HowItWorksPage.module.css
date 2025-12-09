@@ -1,0 +1,182 @@
+/* How It Works Page Styles */
+.pageContainer {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: sans-serif;
+    color: #3E5E6B;
+    /* Deep Teal */
+    background-color: #FAF3EF;
+    /* Cream */
+}
+
+.main {
+    flex: 1;
+    padding-top: 8rem;
+    /* pt-32 */
+    padding-bottom: 4rem;
+}
+
+.wrapper {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+@media (min-width: 768px) {
+    .wrapper {
+        padding-left: 6rem;
+        padding-right: 6rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .wrapper {
+        padding-left: 8rem;
+        padding-right: 8rem;
+    }
+}
+
+.heroSection {
+    text-align: center;
+    margin-bottom: 5rem;
+}
+
+.heroTitle {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 1.5rem;
+}
+
+.heroHighlight {
+    color: #E2D7CF;
+    /* Beige */
+}
+
+.heroDesc {
+    font-size: 1.125rem;
+    color: rgba(62, 94, 107, 0.7);
+    max-width: 42rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.stepsContainer {
+    position: relative;
+}
+
+.connectingLine {
+    display: none;
+    position: absolute;
+    top: 3.75rem;
+    /* 60px roughly */
+    left: 0;
+    right: 0;
+    height: 0.25rem;
+    background-color: #94B7D1;
+    /* Sky Blue */
+    z-index: 0;
+    transform-origin: left;
+}
+
+@media (min-width: 1024px) {
+    .connectingLine {
+        display: block;
+    }
+}
+
+.stepsGrid {
+    display: grid;
+    gap: 3rem;
+}
+
+@media (min-width: 1024px) {
+    .stepsGrid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.stepWrapper {
+    position: relative;
+    padding-top: 1.5rem;
+}
+
+.stepIconWrapper {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 20px 25px -5px rgba(62, 94, 107, 0.2);
+    margin-bottom: 2rem;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    z-index: 10;
+    transition: transform 300ms;
+    border: 4px solid white;
+}
+
+.stepIconWrapper:hover {
+    transform: scale(1.1);
+}
+
+.stepIcon1 {
+    background-color: #3E5E6B;
+}
+
+.stepIcon2 {
+    background-color: #E2D7CF;
+}
+
+.stepIcon3 {
+    background-color: #94B7D1;
+}
+
+.stepNumber {
+    position: absolute;
+    top: -1rem;
+    right: -1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    background-color: white;
+    border: 4px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.875rem;
+    color: #3E5E6B;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.stepContent {
+    text-align: center;
+    padding: 2rem;
+    border-radius: 2rem;
+    background-color: white;
+    border: 1px solid #94B7D1;
+    box-shadow: 0 20px 25px -5px rgba(62, 94, 107, 0.05);
+    transition: all 300ms;
+}
+
+.stepContent:hover {
+    border-color: #E2D7CF;
+    box-shadow: 0 25px 50px -12px rgba(62, 94, 107, 0.1);
+}
+
+.stepTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.stepDesc {
+    color: rgba(62, 94, 107, 0.7);
+    line-height: 1.625;
+    font-size: 0.875rem;
+}

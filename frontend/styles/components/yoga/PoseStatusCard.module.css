@@ -1,0 +1,90 @@
+/* PoseStatusCard Component Styles */
+.card {
+    backdrop-filter: blur(24px);
+    background-color: rgba(62, 94, 107, 0.5);
+    /* Deep Teal */
+    border: 1px solid rgba(148, 183, 209, 0.2);
+    /* Sky Blue */
+    border-radius: 9999px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+}
+
+.columnEnd {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.label {
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94B7D1;
+}
+
+.labelWider {
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #94B7D1;
+    letter-spacing: 0.05em;
+}
+
+.value {
+    font-size: 1.25rem;
+    /* text-xl */
+    font-weight: 900;
+    color: #FAF3EF;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+}
+
+.valueSmall {
+    color: #FAF3EF;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+    font-size: 1.125rem;
+    /* text-lg */
+    font-weight: 700;
+}
+
+.separator {
+    height: 2rem;
+    width: 1px;
+    background-color: rgba(250, 243, 239, 0.2);
+}
+
+.matchContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.matchDot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    transition: all 150ms;
+}
+
+.matchDotGood {
+    background-color: #94B7D1;
+    box-shadow: 0 0 8px #94B7D1;
+}
+
+.matchDotBad {
+    background-color: #E2D7CF;
+}

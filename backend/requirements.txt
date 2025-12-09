@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+numpy
+mediapipe
+scikit-learn
+opencv-python
+pydantic
+protobuf>=4.21.0
