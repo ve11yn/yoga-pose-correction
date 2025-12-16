@@ -2,6 +2,8 @@
 
 YogaFlow AI adalah aplikasi berbasis AI yang mendeteksi pose yoga secara real-time melalui kamera dan memberikan feedback koreksi postur secara langsung.
 
+> 🚀 **Want to deploy this app?** Check out the [Deployment Guide](DEPLOYMENT.md) for step-by-step instructions!
+
 ---
 
 ## 📌 Prerequisites
