@@ -44,15 +44,25 @@ npm install
 
 Kamu bisa menjalankan aplikasi dengan dua cara:
 
-### Option 1 — Start Script (Windows Recommended)
+### Option 1 — Start Script (Windows Recommended) ⚡
 
-Jalankan file berikut dari root project:
+Jalankan salah satu file berikut dari root project:
 
+**Command Prompt:**
 ```bash
 start_app.cmd
 ```
 
-Script ini akan menjalankan backend dan frontend secara otomatis.
+**PowerShell:**
+```powershell
+.\start_app.ps1
+```
+
+Script ini akan:
+- ✅ Membersihkan proses yang sedang berjalan di port 3000 dan 8000
+- ✅ Menghapus lock file Next.js jika ada
+- ✅ Menjalankan backend dan frontend secara otomatis di window terpisah
+- ✅ Menginstall dependencies yang diperlukan
 
 ---
 

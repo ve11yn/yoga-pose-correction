@@ -93,17 +93,44 @@ export function useYogaSession() {
         }
     }, [corrections, isSoundEnabled]);
 
-    // Canvas Drawing Logic
+    // Canvas Drawing Logic - Draw skeleton with connections (mirrored)
     const drawLandmarks = (ctx: CanvasRenderingContext2D, landmarks: any[], w: number, h: number) => {
-        ctx.strokeStyle = "#00FF00";
-        ctx.lineWidth = 2;
-        ctx.fillStyle = "#FF0000";
+        // Define MediaPipe Pose connections (skeleton structure)
+        const POSE_CONNECTIONS = [
+            [0, 1], [1, 2], [2, 3], [3, 7], [0, 4], [4, 5], [5, 6], [6, 8],
+            [9, 10], [11, 12], [11, 13], [13, 15], [15, 17], [15, 19], [15, 21],
+            [17, 19], [12, 14], [14, 16], [16, 18], [16, 20], [16, 22], [18, 20],
+            [11, 23], [12, 24], [23, 24], [23, 25], [24, 26], [25, 27], [26, 28],
+            [27, 29], [28, 30], [29, 31], [30, 32], [27, 31], [28, 32]
+        ];
 
+        // Mirror the canvas horizontally
+        ctx.translate(w, 0);
+        ctx.scale(-1, 1);
+
+        // Draw connections (lines) - Blue color
+        ctx.strokeStyle = "#0099FF"; // Blue lines
+        ctx.lineWidth = 3;
+
+        for (const [startIdx, endIdx] of POSE_CONNECTIONS) {
+            if (landmarks[startIdx] && landmarks[endIdx]) {
+                const start = landmarks[startIdx];
+                const end = landmarks[endIdx];
+
+                ctx.beginPath();
+                ctx.moveTo(start.x * w, start.y * h);
+                ctx.lineTo(end.x * w, end.y * h);
+                ctx.stroke();
+            }
+        }
+
+        // Draw keypoints (small dots) - Blue color
+        ctx.fillStyle = "#0099FF"; // Blue dots
         for (const lm of landmarks) {
             const cx = lm.x * w;
             const cy = lm.y * h;
             ctx.beginPath();
-            ctx.arc(cx, cy, 4, 0, 2 * Math.PI);
+            ctx.arc(cx, cy, 3, 0, 2 * Math.PI);
             ctx.fill();
         }
     };
