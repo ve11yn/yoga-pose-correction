@@ -1,7 +1,3 @@
-"""
-Enhanced Pose Corrector with Visual Body Outline and Alignment Guides
-"""
-
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -31,11 +27,7 @@ class VisualPoseCorrector:
                  max_corrections=3,
                  show_ideal_overlay=True,
                  mirror_display: bool = True):
-        """
-        Initialize the visual corrector with body outline.
-        Args:
-            show_ideal_overlay: Show ideal pose overlay as reference
-        """
+       
         print("Loading model...")
         with open(model_path, 'rb') as f:
             data = pickle.load(f)
@@ -86,7 +78,6 @@ class VisualPoseCorrector:
         print()
     
     def classify_pose(self, landmarks) -> Tuple[str, float]:
-        """Classify pose from MediaPipe landmarks."""
         features = extract_pose_features(landmarks)
         features_scaled = self.scaler.transform(features.reshape(1, -1))
         
@@ -99,7 +90,6 @@ class VisualPoseCorrector:
         return pose_name, confidence
     
     def get_smoothed_pose(self) -> Tuple[Optional[str], float]:
-        """Get smoothed pose prediction from history buffer."""
         if len(self.pose_history) < 3:
             return None, 0.0
         
@@ -117,7 +107,6 @@ class VisualPoseCorrector:
         return most_common_pose, avg_confidence
     
     def check_corrections(self, landmarks, pose_name: str) -> Tuple[List[Dict], float]:
-        """Check pose against correction rules and identify problem joints."""
         if pose_name not in POSE_CORRECTION_RULES:
             return [{'type': 'info', 'message': 'Great form!', 'priority': 1}], 1.0
         
@@ -314,7 +303,6 @@ class VisualPoseCorrector:
         return grouped[:self.max_corrections], quality_score
     
     def _draw_enhanced_skeleton(self, frame, landmarks, quality_score):
-        """Draw enhanced skeleton with color-coded joints and alignment guides."""
         h, w, _ = frame.shape
         lm = landmarks.landmark
         
@@ -412,7 +400,6 @@ class VisualPoseCorrector:
                 cv2.circle(frame, coords, radius + 3, (0, 0, 255), 2)
     
     def _draw_alignment_guides(self, frame, landmarks):
-        """Draw alignment guides for better posture reference."""
         h, w, _ = frame.shape
         lm = landmarks.landmark
         
@@ -448,7 +435,6 @@ class VisualPoseCorrector:
             self._draw_angle_indicator(frame, landmarks, 'elbow')
     
     def _draw_angle_indicator(self, frame, landmarks, joint_type):
-        """Draw angle arc indicator at problem joints."""
         h, w, _ = frame.shape
         lm = landmarks.landmark
         
@@ -500,7 +486,6 @@ class VisualPoseCorrector:
                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     
     def _calculate_knee_angle(self, lm, feature: str) -> Optional[float]:
-        """Calculate knee angle based on feature name."""
         if feature == 'left_knee_angle' or feature == 'standing_knee_angle':
             return calculate_angle(
                 lm[mp_pose.PoseLandmark.LEFT_HIP],
@@ -540,7 +525,6 @@ class VisualPoseCorrector:
         return None
     
     def _calculate_elbow_angle(self, lm, feature: str) -> Optional[float]:
-        """Calculate elbow angle based on feature name."""
         if feature == 'left_elbow_angle':
             return calculate_angle(
                 lm[mp_pose.PoseLandmark.LEFT_SHOULDER],
@@ -556,7 +540,6 @@ class VisualPoseCorrector:
         return None
     
     def _check_angle(self, angle: float, check: Dict) -> Optional[Dict]:
-        """Check if angle meets requirements with two-tier validation."""
         ideal = check.get('ideal', 180)
         tolerance = check.get('tolerance', 10)
         warning_tolerance = check.get('warning_tolerance', tolerance * 1.5)
@@ -578,7 +561,6 @@ class VisualPoseCorrector:
         return None
     
     def _check_distance(self, distance: float, check: Dict) -> Optional[Dict]:
-        """Check if distance meets requirements."""
         tolerance = check.get('tolerance', 0.05)
         
         if distance > tolerance:
@@ -589,7 +571,6 @@ class VisualPoseCorrector:
         return None
     
     def _check_body_alignment(self, lm, check: Dict) -> Optional[Dict]:
-        """Check body alignment for plank pose."""
         shoulder_y = (lm[mp_pose.PoseLandmark.LEFT_SHOULDER].y + 
                      lm[mp_pose.PoseLandmark.RIGHT_SHOULDER].y) / 2
         hip_y = (lm[mp_pose.PoseLandmark.LEFT_HIP].y + 
@@ -610,7 +591,6 @@ class VisualPoseCorrector:
         return None
     
     def _group_corrections_by_body_part(self, corrections: List[Dict]) -> List[Dict]:
-        """Group similar corrections for clearer feedback."""
         grouped = []
         seen_parts = set()
         
@@ -629,7 +609,6 @@ class VisualPoseCorrector:
         return grouped
     
     def calculate_fps(self) -> float:
-        """Calculate current FPS."""
         current_time = time.time()
         fps = 1.0 / (current_time - self.last_frame_time + 1e-6)
         self.last_frame_time = current_time
@@ -637,9 +616,6 @@ class VisualPoseCorrector:
         return np.mean(self.fps_history)
     
     def process_frame(self, frame):
-        """Process frame with enhanced visual feedback."""
-        # Optionally mirror the displayed frame so the overlay matches
-        # the user's mirror-like expectation (user-right == overlay-right).
         if getattr(self, 'mirror_display', True):
             frame = cv2.flip(frame, 1)
 
@@ -709,7 +685,6 @@ class VisualPoseCorrector:
             return frame, smoothed_pose, corrections, avg_confidence, fps
     
     def _draw_info(self, frame, pose_name, corrections, confidence, fps, status, quality_score):
-        """Draw enhanced information overlay on frame."""
         h, w = frame.shape[:2]
         
         # Semi-transparent background
@@ -842,7 +817,6 @@ class VisualPoseCorrector:
 
 
 def main():
-    """Main function with enhanced visual feedback."""
     print("\n" + "="*70)
     print("  VISUAL YOGA POSE CORRECTION WITH BODY OUTLINE")
     print("="*70)

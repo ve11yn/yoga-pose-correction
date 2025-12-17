@@ -127,14 +127,6 @@ async def classify_pose(data: PoseData):
         raise HTTPException(status_code=500, detail=str(e))
 
 def check_corrections_logic(landmarks, pose_name: str, confidence: float) -> List[str]:
-    """
-    Re-implementation of check_corrections from correction.py to start from wrapper.
-    Ideally we should import this logic if it was a standalone function, 
-    but it's a method of RealtimePoseCorrector class in correction.py.
-    We'll replicate the logic here or refactor correction.py to check our constraints.
-    Constraint: 'only integrated'. We shouldn't change correction.py.
-    So we interpret 'integrated' as using the rules defined in pose_rules.py.
-    """
     corrections = []
     
     if pose_name not in POSE_CORRECTION_RULES:

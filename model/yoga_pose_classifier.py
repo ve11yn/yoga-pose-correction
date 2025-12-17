@@ -21,16 +21,6 @@ pose = mp_pose.Pose(
 )
 
 def calculate_angle(p1, p2, p3):
-    """
-    Calculate angle between three points (p1-p2-p3)
-    p2 is the vertex (middle point)
-
-    Args:
-        p1, p2, p3: landmarks with .x, .y attributes
-
-    Returns:
-        angle in degrees
-    """
     # Convert to numpy arrays
     a = np.array([p1.x, p1.y])
     b = np.array([p2.x, p2.y])
@@ -47,16 +37,9 @@ def calculate_angle(p1, p2, p3):
     return np.degrees(angle)
 
 def calculate_distance(p1, p2):
-    """Calculate Euclidean distance between two points"""
     return np.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2)
 
 def extract_pose_features(landmarks):
-    """
-    Extract comprehensive features from pose landmarks
-
-    Returns:
-        numpy array of ~50 features
-    """
     features = []
 
     # Get landmark shortcuts
@@ -213,11 +196,6 @@ def extract_pose_features(landmarks):
     return np.array(features)
 
 def process_image(image_path):
-    """
-    Process a single image and extract pose features.
-    Returns:
-        features (numpy array) or None if pose not detected
-    """
     image = cv2.imread(image_path)
     if image is None:
         return None
@@ -281,7 +259,6 @@ import cv2
 import matplotlib.pyplot as plt
 
 def draw_landmarks_with_names(image_rgb, results):
-    """Draw skeleton + keypoint labels on the image."""
     if not results.pose_landmarks:
         return image_rgb
 
