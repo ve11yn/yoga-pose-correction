@@ -1,12 +1,12 @@
-# 🧘‍♀️ YogaFlow AI
+# 🧘‍♀️ Zenva YogaFlow
 
 <div align="center">
 
-![Project Banner](https://img.shields.io/badge/YogaFlow-AI-blue?style=for-the-badge&logo=yoga&logoColor=white)
+![Project Banner](https://img.shields.io/badge/Zenva-Yogaflow-blue?style=for-the-badge&logo=yoga&logoColor=white)
 
 **A Real-Time AI Yoga Instructor powered by Computer Vision**
 
-[View Live Demo](https://yoga-pose-correction.vercel.app) · [Backend API](https://revckries-yoga-pose-backend.hf.space) · [Report Bug](https://github.com/ve11yn/yoga-pose-correction/issues)
+[View Website](https://zenva-yogaflow.vercel.app/) · [Backend API](https://revckries-yoga-pose-backend.hf.space) · [Report Bug](https://github.com/ve11yn/yoga-pose-correction/issues)
 
 </div>
 
