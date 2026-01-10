@@ -3,6 +3,7 @@ uvicorn
 numpy
 mediapipe
 scikit-learn
-opencv-python
+opencv-python-headless
 pydantic
 protobuf>=4.0.0
+matplotlib

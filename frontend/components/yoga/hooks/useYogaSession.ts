@@ -3,7 +3,9 @@ import Webcam from "react-webcam";
 import axios from "axios";
 
 // Constants
-const API_URL = "http://localhost:8000/classify";
+const API_URL = process.env.NEXT_PUBLIC_API_URL 
+  ? `${process.env.NEXT_PUBLIC_API_URL}/classify` 
+  : "http://localhost:8000/classify";
 
 export interface YogaStats {
   fps: number;
