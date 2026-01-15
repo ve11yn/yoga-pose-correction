@@ -7,17 +7,42 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
 import pandas as pd
-from mp_constants import PoseLandmark
 
-# mp_pose = mp.solutions.pose
-# mp_drawing = mp.solutions.drawing_utils
-
-# pose = mp_pose.Pose(
-#     static_image_mode=True,
-#     model_complexity=2,
-#     enable_segmentation=False,
-#     min_detection_confidence=0.5
-# )
+# Define Constants directly here to remove external dependency
+class PoseLandmark:
+    NOSE = 0
+    LEFT_EYE_INNER = 1
+    LEFT_EYE = 2
+    LEFT_EYE_OUTER = 3
+    RIGHT_EYE_INNER = 4
+    RIGHT_EYE = 5
+    RIGHT_EYE_OUTER = 6
+    LEFT_EAR = 7
+    RIGHT_EAR = 8
+    MOUTH_LEFT = 9
+    MOUTH_RIGHT = 10
+    LEFT_SHOULDER = 11
+    RIGHT_SHOULDER = 12
+    LEFT_ELBOW = 13
+    RIGHT_ELBOW = 14
+    LEFT_WRIST = 15
+    RIGHT_WRIST = 16
+    LEFT_PINKY = 17
+    RIGHT_PINKY = 18
+    LEFT_INDEX = 19
+    RIGHT_INDEX = 20
+    LEFT_THUMB = 21
+    RIGHT_THUMB = 22
+    LEFT_HIP = 23
+    RIGHT_HIP = 24
+    LEFT_KNEE = 25
+    RIGHT_KNEE = 26
+    LEFT_ANKLE = 27
+    RIGHT_ANKLE = 28
+    LEFT_HEEL = 29
+    RIGHT_HEEL = 30
+    LEFT_FOOT_INDEX = 31
+    RIGHT_FOOT_INDEX = 32
 
 def calculate_angle(p1, p2, p3):
     # Convert to numpy arrays
@@ -196,10 +221,8 @@ def extract_pose_features(landmarks):
 
 def process_image(image_path):
     pass 
-    # DISABLED: MediaPipe Dependency Removed
     # Use only if you have a working MediaPipe installation for training
 
-# ... rest of file (training logic) ...
 
 def load_dataset(dataset_path):
     X = []

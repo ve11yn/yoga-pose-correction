@@ -6,35 +6,27 @@ import sys
 import os
 import pickle
 import numpy as np
-# import mediapipe as mp # REMOVED
 
-# Add model directory to path so we can import modules from it
 current_dir = os.path.dirname(os.path.abspath(__file__))
 model_dir = os.path.join(current_dir, '..', 'model')
 sys.path.append(model_dir)
 
-# Import from the model directory
 try:
-    from mp_constants import PoseLandmark # Import constants directly
-    from yoga_pose_classifier import extract_pose_features, calculate_angle, calculate_distance
+    from yoga_pose_classifier import extract_pose_features, calculate_angle, calculate_distance, PoseLandmark
     from pose_rules import POSE_CORRECTION_RULES
 except ImportError as e:
     print(f"Error importing model modules: {e}")
-    # We will handle this gracefully in the endpoints
 
 app = FastAPI()
 
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify the frontend URL
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Initialize MediaPipe Pose for constant/enum access
-# mp_pose = mp.solutions.pose # REMOVED
 
 # Load Model (Global variable)
 model_data = None
@@ -54,7 +46,6 @@ def load_model():
 
 load_model()
 
-# ... (Rest of Data models unchanged)
 class LandmarkPoint(BaseModel):
     x: float
     y: float
@@ -91,8 +82,6 @@ async def classify_pose(data: PoseData):
         raise HTTPException(status_code=503, detail="Model not loaded")
     
     try:
-        # print("Received request with", len(data.landmarks), "landmarks")
-        
         # Wrap landmarks to match what extract_pose_features expects
         wrapped_landmarks = LandmarkListWrapper(data.landmarks)
         
