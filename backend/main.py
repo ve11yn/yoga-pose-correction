@@ -6,7 +6,7 @@ import sys
 import os
 import pickle
 import numpy as np
-import mediapipe as mp
+# import mediapipe as mp # REMOVED
 
 # Add model directory to path so we can import modules from it
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -15,6 +15,7 @@ sys.path.append(model_dir)
 
 # Import from the model directory
 try:
+    from mp_constants import PoseLandmark # Import constants directly
     from yoga_pose_classifier import extract_pose_features, calculate_angle, calculate_distance
     from pose_rules import POSE_CORRECTION_RULES
 except ImportError as e:
@@ -33,7 +34,7 @@ app.add_middleware(
 )
 
 # Initialize MediaPipe Pose for constant/enum access
-mp_pose = mp.solutions.pose
+# mp_pose = mp.solutions.pose # REMOVED
 
 # Load Model (Global variable)
 model_data = None
@@ -53,12 +54,12 @@ def load_model():
 
 load_model()
 
-# Data models
+# ... (Rest of Data models unchanged)
 class LandmarkPoint(BaseModel):
     x: float
     y: float
     z: float
-    visibility: float
+    visibility: Optional[float] = 0.0
 
 class PoseData(BaseModel):
     landmarks: List[LandmarkPoint]
@@ -90,28 +91,41 @@ async def classify_pose(data: PoseData):
         raise HTTPException(status_code=503, detail="Model not loaded")
     
     try:
+        # print("Received request with", len(data.landmarks), "landmarks")
+        
         # Wrap landmarks to match what extract_pose_features expects
         wrapped_landmarks = LandmarkListWrapper(data.landmarks)
         
         # 1. Extract features
-        features = extract_pose_features(wrapped_landmarks)
-        
+        try:
+            features = extract_pose_features(wrapped_landmarks)
+            # print("Features extracted:", features.shape)
+        except Exception as e:
+            print(f"Feature extraction failed: {e}")
+            import traceback
+            traceback.print_exc()
+            raise e
+
         # 2. Normalize features
-        scaler = model_data['scaler']
-        features_scaled = scaler.transform(features.reshape(1, -1))
+        try:
+            scaler = model_data['scaler']
+            features_scaled = scaler.transform(features.reshape(1, -1))
+        except Exception as e:
+             print(f"Scaling failed: {e}")
+             raise e
         
         # 3. Predict Pose
         model = model_data['model']
         pose_names = model_data['pose_names']
         
-        pose_idx = model.predict(features_scaled)[0]
+        pose_idx = int(model.predict(features_scaled)[0])
         pose_name = pose_names[pose_idx]
         
         # 4. Get Confidence
         probabilities = model.predict_proba(features_scaled)[0]
         confidence = float(probabilities[pose_idx])
         
-        print(f"Pred: {pose_name} ({confidence:.2f})") # Debug log
+        print(f"Success: {pose_name} ({confidence:.2f})") 
         
         # 5. Check Corrections
         corrections = check_corrections_logic(wrapped_landmarks, pose_name, confidence)
@@ -123,8 +137,10 @@ async def classify_pose(data: PoseData):
         )
         
     except Exception as e:
-        print(f"Error processing pose: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        traceback.print_exc()
+        print(f"CRITICAL ERROR processing pose: {e}")
+        raise HTTPException(status_code=500, detail=f"Server Error: {str(e)}")
 
 def check_corrections_logic(landmarks, pose_name: str, confidence: float) -> List[str]:
     corrections = []
@@ -146,9 +162,9 @@ def check_corrections_logic(landmarks, pose_name: str, confidence: float) -> Lis
         # KNEE ANGLES
         if feature == 'left_knee_angle':
             val = calculate_angle(
-                lm[mp_pose.PoseLandmark.LEFT_HIP],
-                lm[mp_pose.PoseLandmark.LEFT_KNEE],
-                lm[mp_pose.PoseLandmark.LEFT_ANKLE]
+                lm[PoseLandmark.LEFT_HIP],
+                lm[PoseLandmark.LEFT_KNEE],
+                lm[PoseLandmark.LEFT_ANKLE]
             )
             # Tolerance usually in degrees
             tolerance = check.get('tolerance', 10)
@@ -157,9 +173,9 @@ def check_corrections_logic(landmarks, pose_name: str, confidence: float) -> Lis
                 
         elif feature == 'right_knee_angle':
             val = calculate_angle(
-                lm[mp_pose.PoseLandmark.RIGHT_HIP],
-                lm[mp_pose.PoseLandmark.RIGHT_KNEE],
-                lm[mp_pose.PoseLandmark.RIGHT_ANKLE]
+                lm[PoseLandmark.RIGHT_HIP],
+                lm[PoseLandmark.RIGHT_KNEE],
+                lm[PoseLandmark.RIGHT_ANKLE]
             )
             tolerance = check.get('tolerance', 10)
             if abs(val - ideal) > tolerance:
@@ -168,9 +184,9 @@ def check_corrections_logic(landmarks, pose_name: str, confidence: float) -> Lis
         # ELBOW ANGLES
         elif feature == 'left_elbow_angle':
             val = calculate_angle(
-                lm[mp_pose.PoseLandmark.LEFT_SHOULDER],
-                lm[mp_pose.PoseLandmark.LEFT_ELBOW],
-                lm[mp_pose.PoseLandmark.LEFT_WRIST]
+                lm[PoseLandmark.LEFT_SHOULDER],
+                lm[PoseLandmark.LEFT_ELBOW],
+                lm[PoseLandmark.LEFT_WRIST]
             )
             tolerance = check.get('tolerance', 15)
             if abs(val - ideal) > tolerance:
@@ -178,9 +194,9 @@ def check_corrections_logic(landmarks, pose_name: str, confidence: float) -> Lis
                 
         elif feature == 'right_elbow_angle':
             val = calculate_angle(
-                lm[mp_pose.PoseLandmark.RIGHT_SHOULDER],
-                lm[mp_pose.PoseLandmark.RIGHT_ELBOW],
-                lm[mp_pose.PoseLandmark.RIGHT_WRIST]
+                lm[PoseLandmark.RIGHT_SHOULDER],
+                lm[PoseLandmark.RIGHT_ELBOW],
+                lm[PoseLandmark.RIGHT_WRIST]
             )
             tolerance = check.get('tolerance', 15)
             if abs(val - ideal) > tolerance:
@@ -189,9 +205,9 @@ def check_corrections_logic(landmarks, pose_name: str, confidence: float) -> Lis
         # SPINE ANGLE
         elif feature == 'spine_angle':
             val = calculate_angle(
-                lm[mp_pose.PoseLandmark.LEFT_SHOULDER],
-                lm[mp_pose.PoseLandmark.LEFT_HIP],
-                lm[mp_pose.PoseLandmark.LEFT_KNEE]
+                lm[PoseLandmark.LEFT_SHOULDER],
+                lm[PoseLandmark.LEFT_HIP],
+                lm[PoseLandmark.LEFT_KNEE]
             )
             tolerance = check.get('tolerance', 15)
             if abs(val - ideal) > tolerance:
@@ -199,16 +215,16 @@ def check_corrections_logic(landmarks, pose_name: str, confidence: float) -> Lis
 
         # SHOULDER LEVEL
         elif feature == 'shoulder_level_diff':
-            val = abs(lm[mp_pose.PoseLandmark.LEFT_SHOULDER].y - 
-                      lm[mp_pose.PoseLandmark.RIGHT_SHOULDER].y)
+            val = abs(lm[PoseLandmark.LEFT_SHOULDER].y - 
+                      lm[PoseLandmark.RIGHT_SHOULDER].y)
             threshold = check.get('tolerance', 0.03)
             if val > threshold:
                 corrections.append(message)
 
         # HIP LEVEL
         elif feature == 'hip_level_diff':
-            val = abs(lm[mp_pose.PoseLandmark.LEFT_HIP].y - 
-                      lm[mp_pose.PoseLandmark.RIGHT_HIP].y)
+            val = abs(lm[PoseLandmark.LEFT_HIP].y - 
+                      lm[PoseLandmark.RIGHT_HIP].y)
             threshold = check.get('tolerance', 0.03)
             if val > threshold:
                 corrections.append(message)
@@ -216,8 +232,8 @@ def check_corrections_logic(landmarks, pose_name: str, confidence: float) -> Lis
         # FOOT DISTANCE
         elif feature == 'foot_distance':
             val = calculate_distance(
-                lm[mp_pose.PoseLandmark.LEFT_ANKLE],
-                lm[mp_pose.PoseLandmark.RIGHT_ANKLE]
+                lm[PoseLandmark.LEFT_ANKLE],
+                lm[PoseLandmark.RIGHT_ANKLE]
             )
             min_dist = check.get('min', 0.3)
             if val < min_dist:

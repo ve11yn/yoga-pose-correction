@@ -3,8 +3,8 @@ import Webcam from "react-webcam";
 import axios from "axios";
 
 // Constants
-const API_URL = process.env.NEXT_PUBLIC_API_URL 
-  ? `${process.env.NEXT_PUBLIC_API_URL}/classify` 
+const API_URL = process.env.NEXT_PUBLIC_API_URL
+  ? `${process.env.NEXT_PUBLIC_API_URL}/classify`
   : "http://localhost:8000/classify";
 
 export interface YogaStats {
@@ -18,7 +18,10 @@ export function useYogaSession() {
   const poseRef = useRef<any>(null);
   const requestRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
+  const lastFpsUpdateTimeRef = useRef<number>(0);
   const isLoopRunning = useRef<boolean>(false);
+  const lastApiCallTimeRef = useRef<number>(0);
+  const isApiProcessingRef = useRef<boolean>(false);
 
   // State
   const [isActive, setIsActive] = useState(false);
@@ -27,6 +30,7 @@ export function useYogaSession() {
   const [corrections, setCorrections] = useState<string[]>([]);
   const [stats, setStats] = useState<YogaStats>({ fps: 0, sessionTime: 0 });
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   // TTS Refs
   const lastSpokenTimeRef = useRef<number>(0);
@@ -38,6 +42,23 @@ export function useYogaSession() {
 
   // Recording State
   const [isRecording, setIsRecording] = useState(false);
+
+  // Initial Health Check
+  useEffect(() => {
+    // Check if backend is reachable once on mount
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/`)
+      .then(res => {
+        if (res.data.status === "ok") {
+          console.log("Backend Connected", res.data);
+          setApiError(null);
+        }
+      })
+      .catch(err => {
+        const msg = "Cannot connect to AI Server. Is it running?";
+        console.error(msg, err);
+        setApiError(msg);
+      });
+  }, []);
 
   // Timer Effect
   useEffect(() => {
@@ -144,14 +165,21 @@ export function useYogaSession() {
     async (results: any) => {
       // Calculate FPS
       const now = Date.now();
-      if (lastTimeRef.current === 0) {
-        lastTimeRef.current = now;
-      }
+      // Initialize if needed
+      if (lastTimeRef.current === 0) lastTimeRef.current = now;
+      if (lastFpsUpdateTimeRef.current === 0) lastFpsUpdateTimeRef.current = now;
+
       const delta = now - lastTimeRef.current;
-      if (delta > 0) {
-        setStats((prev) => ({ ...prev, fps: Math.round(1000 / delta) }));
-      }
       lastTimeRef.current = now;
+
+      // Only update React state for FPS every 500ms to verify/avoid excessive re-renders
+      if (now - lastFpsUpdateTimeRef.current >= 500) {
+        if (delta > 0) {
+          const currentFps = Math.round(1000 / delta);
+          setStats((prev) => ({ ...prev, fps: currentFps }));
+        }
+        lastFpsUpdateTimeRef.current = now;
+      }
 
       if (canvasRef.current && webcamRef.current?.video) {
         const videoWidth = webcamRef.current.video.videoWidth;
@@ -173,22 +201,54 @@ export function useYogaSession() {
               videoHeight
             );
 
-            try {
-              const response = await axios.post(API_URL, {
-                landmarks: results.poseLandmarks,
-              });
-              const data = response.data;
-              setCurrentPose(data.pose_name);
-              setConfidence(data.confidence);
-              setCorrections(data.corrections);
-            } catch (err) {
-              console.error("API Error", err);
+            // Throttle API calls to prevent lag
+            // Only send if:
+            // 1. Enough time has passed (200ms = 5 FPS cap for classification)
+            // 2. No other request is currently processing
+            const now = Date.now();
+            if (now - lastApiCallTimeRef.current >= 200 && !isApiProcessingRef.current) {
+              isApiProcessingRef.current = true;
+              lastApiCallTimeRef.current = now;
+
+              // Explicitly map landmarks to ensure clean JSON object with no missing fields
+              const formattedLandmarks = results.poseLandmarks.map((lm: any) => ({
+                x: lm.x,
+                y: lm.y,
+                z: lm.z,
+                visibility: lm.visibility ?? 0.0,
+              }));
+
+              // Don't await this! Let it run in background so we don't block rendering
+              axios.post(API_URL, {
+                landmarks: formattedLandmarks,
+              }, { timeout: 5000 }) // 5s timeout
+                .then((response) => {
+                  const data = response.data;
+                  setCurrentPose(data.pose_name);
+                  setConfidence(data.confidence);
+                  setCorrections(data.corrections);
+                  setApiError(null);
+                })
+                .catch((err) => {
+                  console.error("API Error Details:", err.response?.data || err.message);
+                  if (err.code === "ERR_NETWORK") {
+                    setApiError("Backend disconnected");
+                  } else {
+                    setApiError(`API Error: ${err.response?.data?.detail || err.message}`);
+                  }
+                })
+                .finally(() => {
+                  isApiProcessingRef.current = false;
+                });
             }
           } else {
             // No pose detected - reset to default state
-            setCurrentPose("Waiting...");
-            setConfidence(0);
-            setCorrections([]);
+            // Only reset if we truly lost the pose for a bit to avoid flickering
+            if (!isApiProcessingRef.current) {
+              setCurrentPose("Waiting...");
+              setConfidence(0);
+              setCorrections([]);
+            }
           }
           canvasCtx.restore();
         }
@@ -369,5 +429,6 @@ export function useYogaSession() {
     isRecording,
     startRecording,
     stopRecording,
+    apiError
   };
 }

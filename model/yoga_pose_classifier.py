@@ -1,24 +1,23 @@
 import os
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
-import mediapipe as mp
 import pickle
 import os
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
 import pandas as pd
+from mp_constants import PoseLandmark
 
-mp_pose = mp.solutions.pose
-mp_drawing = mp.solutions.drawing_utils
+# mp_pose = mp.solutions.pose
+# mp_drawing = mp.solutions.drawing_utils
 
-pose = mp_pose.Pose(
-    static_image_mode=True,
-    model_complexity=2,
-    enable_segmentation=False,
-    min_detection_confidence=0.5
-)
+# pose = mp_pose.Pose(
+#     static_image_mode=True,
+#     model_complexity=2,
+#     enable_segmentation=False,
+#     min_detection_confidence=0.5
+# )
 
 def calculate_angle(p1, p2, p3):
     # Convert to numpy arrays
@@ -49,77 +48,77 @@ def extract_pose_features(landmarks):
 
     # Left arm angles
     left_shoulder_angle = calculate_angle(
-        lm[mp_pose.PoseLandmark.LEFT_ELBOW],
-        lm[mp_pose.PoseLandmark.LEFT_SHOULDER],
-        lm[mp_pose.PoseLandmark.LEFT_HIP]
+        lm[PoseLandmark.LEFT_ELBOW],
+        lm[PoseLandmark.LEFT_SHOULDER],
+        lm[PoseLandmark.LEFT_HIP]
     )
     features.append(left_shoulder_angle)
 
     left_elbow_angle = calculate_angle(
-        lm[mp_pose.PoseLandmark.LEFT_SHOULDER],
-        lm[mp_pose.PoseLandmark.LEFT_ELBOW],
-        lm[mp_pose.PoseLandmark.LEFT_WRIST]
+        lm[PoseLandmark.LEFT_SHOULDER],
+        lm[PoseLandmark.LEFT_ELBOW],
+        lm[PoseLandmark.LEFT_WRIST]
     )
     features.append(left_elbow_angle)
 
     # Right arm angles
     right_shoulder_angle = calculate_angle(
-        lm[mp_pose.PoseLandmark.RIGHT_ELBOW],
-        lm[mp_pose.PoseLandmark.RIGHT_SHOULDER],
-        lm[mp_pose.PoseLandmark.RIGHT_HIP]
+        lm[PoseLandmark.RIGHT_ELBOW],
+        lm[PoseLandmark.RIGHT_SHOULDER],
+        lm[PoseLandmark.RIGHT_HIP]
     )
     features.append(right_shoulder_angle)
 
     right_elbow_angle = calculate_angle(
-        lm[mp_pose.PoseLandmark.RIGHT_SHOULDER],
-        lm[mp_pose.PoseLandmark.RIGHT_ELBOW],
-        lm[mp_pose.PoseLandmark.RIGHT_WRIST]
+        lm[PoseLandmark.RIGHT_SHOULDER],
+        lm[PoseLandmark.RIGHT_ELBOW],
+        lm[PoseLandmark.RIGHT_WRIST]
     )
     features.append(right_elbow_angle)
 
     # Left leg angles
     left_hip_angle = calculate_angle(
-        lm[mp_pose.PoseLandmark.LEFT_SHOULDER],
-        lm[mp_pose.PoseLandmark.LEFT_HIP],
-        lm[mp_pose.PoseLandmark.LEFT_KNEE]
+        lm[PoseLandmark.LEFT_SHOULDER],
+        lm[PoseLandmark.LEFT_HIP],
+        lm[PoseLandmark.LEFT_KNEE]
     )
     features.append(left_hip_angle)
 
     left_knee_angle = calculate_angle(
-        lm[mp_pose.PoseLandmark.LEFT_HIP],
-        lm[mp_pose.PoseLandmark.LEFT_KNEE],
-        lm[mp_pose.PoseLandmark.LEFT_ANKLE]
+        lm[PoseLandmark.LEFT_HIP],
+        lm[PoseLandmark.LEFT_KNEE],
+        lm[PoseLandmark.LEFT_ANKLE]
     )
     features.append(left_knee_angle)
 
     # Right leg angles
     right_hip_angle = calculate_angle(
-        lm[mp_pose.PoseLandmark.RIGHT_SHOULDER],
-        lm[mp_pose.PoseLandmark.RIGHT_HIP],
-        lm[mp_pose.PoseLandmark.RIGHT_KNEE]
+        lm[PoseLandmark.RIGHT_SHOULDER],
+        lm[PoseLandmark.RIGHT_HIP],
+        lm[PoseLandmark.RIGHT_KNEE]
     )
     features.append(right_hip_angle)
 
     right_knee_angle = calculate_angle(
-        lm[mp_pose.PoseLandmark.RIGHT_HIP],
-        lm[mp_pose.PoseLandmark.RIGHT_KNEE],
-        lm[mp_pose.PoseLandmark.RIGHT_ANKLE]
+        lm[PoseLandmark.RIGHT_HIP],
+        lm[PoseLandmark.RIGHT_KNEE],
+        lm[PoseLandmark.RIGHT_ANKLE]
     )
     features.append(right_knee_angle)
 
     # Spine/torso angles
     spine_angle = calculate_angle(
-        lm[mp_pose.PoseLandmark.LEFT_SHOULDER],
-        lm[mp_pose.PoseLandmark.LEFT_HIP],
-        lm[mp_pose.PoseLandmark.LEFT_KNEE]
+        lm[PoseLandmark.LEFT_SHOULDER],
+        lm[PoseLandmark.LEFT_HIP],
+        lm[PoseLandmark.LEFT_KNEE]
     )
     features.append(spine_angle)
 
     # Neck angle
     neck_angle = calculate_angle(
-        lm[mp_pose.PoseLandmark.LEFT_SHOULDER],
-        lm[mp_pose.PoseLandmark.NOSE],
-        lm[mp_pose.PoseLandmark.LEFT_EAR]
+        lm[PoseLandmark.LEFT_SHOULDER],
+        lm[PoseLandmark.NOSE],
+        lm[PoseLandmark.LEFT_EAR]
     )
     features.append(neck_angle)
 
@@ -127,15 +126,15 @@ def extract_pose_features(landmarks):
 
     # Hand distance (for poses with hands together)
     hand_distance = calculate_distance(
-        lm[mp_pose.PoseLandmark.LEFT_WRIST],
-        lm[mp_pose.PoseLandmark.RIGHT_WRIST]
+        lm[PoseLandmark.LEFT_WRIST],
+        lm[PoseLandmark.RIGHT_WRIST]
     )
     features.append(hand_distance)
 
     # Foot distance (for poses with wide stance)
     foot_distance = calculate_distance(
-        lm[mp_pose.PoseLandmark.LEFT_ANKLE],
-        lm[mp_pose.PoseLandmark.RIGHT_ANKLE]
+        lm[PoseLandmark.LEFT_ANKLE],
+        lm[PoseLandmark.RIGHT_ANKLE]
     )
     features.append(foot_distance)
 
@@ -143,35 +142,35 @@ def extract_pose_features(landmarks):
 
     # Calculate body height (shoulder to ankle)
     body_height = calculate_distance(
-        lm[mp_pose.PoseLandmark.LEFT_SHOULDER],
-        lm[mp_pose.PoseLandmark.LEFT_ANKLE]
+        lm[PoseLandmark.LEFT_SHOULDER],
+        lm[PoseLandmark.LEFT_ANKLE]
     )
 
     # Arm length ratios
     left_arm_length = calculate_distance(
-        lm[mp_pose.PoseLandmark.LEFT_SHOULDER],
-        lm[mp_pose.PoseLandmark.LEFT_WRIST]
+        lm[PoseLandmark.LEFT_SHOULDER],
+        lm[PoseLandmark.LEFT_WRIST]
     )
     features.append(left_arm_length / (body_height + 1e-6))
 
     right_arm_length = calculate_distance(
-        lm[mp_pose.PoseLandmark.RIGHT_SHOULDER],
-        lm[mp_pose.PoseLandmark.RIGHT_WRIST]
+        lm[PoseLandmark.RIGHT_SHOULDER],
+        lm[PoseLandmark.RIGHT_WRIST]
     )
     features.append(right_arm_length / (body_height + 1e-6))
 
     # ==================== POSITION FEATURES ====================
 
     # Y-coordinates (height) of key points (normalized)
-    features.append(lm[mp_pose.PoseLandmark.LEFT_WRIST].y)
-    features.append(lm[mp_pose.PoseLandmark.RIGHT_WRIST].y)
-    features.append(lm[mp_pose.PoseLandmark.LEFT_ANKLE].y)
-    features.append(lm[mp_pose.PoseLandmark.RIGHT_ANKLE].y)
-    features.append(lm[mp_pose.PoseLandmark.NOSE].y)
+    features.append(lm[PoseLandmark.LEFT_WRIST].y)
+    features.append(lm[PoseLandmark.RIGHT_WRIST].y)
+    features.append(lm[PoseLandmark.LEFT_ANKLE].y)
+    features.append(lm[PoseLandmark.RIGHT_ANKLE].y)
+    features.append(lm[PoseLandmark.NOSE].y)
 
     # X-coordinates (width) - for left/right alignment
-    features.append(lm[mp_pose.PoseLandmark.LEFT_SHOULDER].x)
-    features.append(lm[mp_pose.PoseLandmark.RIGHT_SHOULDER].x)
+    features.append(lm[PoseLandmark.LEFT_SHOULDER].x)
+    features.append(lm[PoseLandmark.RIGHT_SHOULDER].x)
 
     # ==================== SYMMETRY FEATURES ====================
 
@@ -184,35 +183,23 @@ def extract_pose_features(landmarks):
     features.append(leg_symmetry)
 
     # Shoulder level difference
-    shoulder_level = abs(lm[mp_pose.PoseLandmark.LEFT_SHOULDER].y -
-                         lm[mp_pose.PoseLandmark.RIGHT_SHOULDER].y)
+    shoulder_level = abs(lm[PoseLandmark.LEFT_SHOULDER].y -
+                         lm[PoseLandmark.RIGHT_SHOULDER].y)
     features.append(shoulder_level)
 
     # Hip level difference
-    hip_level = abs(lm[mp_pose.PoseLandmark.LEFT_HIP].y -
-                    lm[mp_pose.PoseLandmark.RIGHT_HIP].y)
+    hip_level = abs(lm[PoseLandmark.LEFT_HIP].y -
+                    lm[PoseLandmark.RIGHT_HIP].y)
     features.append(hip_level)
 
     return np.array(features)
 
 def process_image(image_path):
-    image = cv2.imread(image_path)
-    if image is None:
-        return None
+    pass 
+    # DISABLED: MediaPipe Dependency Removed
+    # Use only if you have a working MediaPipe installation for training
 
-    img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-    # Run MediaPipe
-    results = pose.process(img_rgb)
-
-    # If no pose → skip image
-    if not results.pose_landmarks:
-        return None
-
-    # Extract features from landmarks
-    features = extract_pose_features(results.pose_landmarks)
-
-    return features
+# ... rest of file (training logic) ...
 
 def load_dataset(dataset_path):
     X = []

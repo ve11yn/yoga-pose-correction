@@ -42,9 +42,8 @@ export const CameraView: React.FC<CameraViewProps> = ({
 }) => {
   return (
     <div
-      className={`${styles.cameraContainer} ${
-        isActive ? styles.cameraContainerActive : styles.cameraContainerInactive
-      }`}
+      className={`${styles.cameraContainer} ${isActive ? styles.cameraContainerActive : styles.cameraContainerInactive
+        }`}
     >
       {isActive ? (
         <>
@@ -53,7 +52,7 @@ export const CameraView: React.FC<CameraViewProps> = ({
             <Webcam
               ref={webcamRef}
               className={styles.webcam}
-              mirrored={false}
+              mirrored={true}
               videoConstraints={{
                 facingMode: "user",
                 aspectRatio: 16 / 9,
@@ -86,9 +85,8 @@ export const CameraView: React.FC<CameraViewProps> = ({
               <div className={styles.fpsBadge}>{fps} FPS</div>
               <button
                 onClick={isRecording ? onStopRecording : onStartRecording}
-                className={`${styles.recordBtn} ${
-                  isRecording ? styles.recordBtnActive : ""
-                }`}
+                className={`${styles.recordBtn} ${isRecording ? styles.recordBtnActive : ""
+                  }`}
                 title={isRecording ? "Stop Recording" : "Start Recording"}
               >
                 <div className={styles.recordIconWrapper}>
